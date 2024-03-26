@@ -1,0 +1,113 @@
+import random
+
+class TreeNode:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+def insert_bst(root, value):
+    if root is None:
+        return TreeNode(value)
+    if value < root.value:
+        root.left = insert_bst(root.left, value)
+    elif value > root.value:
+        root.right = insert_bst(root.right, value)
+    return root
+
+def construct_random_bst():
+    root = None
+    sequence = random.sample(range(1, 31), 10)  # Generowanie ciągu losowych liczb naturalnych od 1 do 30
+    for num in sequence:
+        root = insert_bst(root, num)
+    return root
+
+def reverse_inorder_traversal(root):
+    if root is None:
+        return
+
+    reverse_inorder_traversal(root.right)
+    print(root.value, end=" ")
+    reverse_inorder_traversal(root.left)
+
+def preorder_traversal(root):
+    if root is None:
+        return
+
+    print(root.value, end=" ")
+    preorder_traversal(root.left)
+    preorder_traversal(root.right)
+
+def find_min_bst(root):
+    print("\nPATH to min", end=" ")
+    current = root
+    while current.left is not None:
+        print(current.value, end=" -> ")
+        current = current.left
+    print(current.value)
+    return current.value
+
+def find_max_bst(root):
+    print("\nPATH to max", end=" ")
+    current = root
+    while current.right is not None:
+        print(current.value, end=" -> ")
+        current = current.right
+    print(current.value)
+    return current.value
+
+
+def find_level_and_print_elements(root, key, current_level=1, target_level=None, level_nodes=None):
+    if root is None:
+        print("Drzewo jest puste.")
+        return None
+
+    if target_level is None and root.value == key:
+        target_level = current_level
+
+    if target_level == current_level:
+        if level_nodes is None:
+            level_nodes = []
+        level_nodes.append(root.value)
+
+    if root.left:
+        target_level, level_nodes = find_level_and_print_elements(root.left, key, current_level + 1, target_level, level_nodes)
+    if root.right:
+        target_level, level_nodes = find_level_and_print_elements(root.right, key, current_level + 1, target_level, level_nodes)
+
+    if target_level == current_level:
+        print(f"Węzeł o kluczu {key} znajduje się na poziomie {target_level}")
+        print(f"Elementy na poziomie {target_level}: {', '.join(map(str, level_nodes))}")
+
+    return target_level, level_nodes
+
+def delete_node(root, key):
+    if root is None:
+        return None
+
+    if root.value == key:
+        return None
+
+    root.left = delete_node(root.left, key)
+    root.right = delete_node(root.right, key)
+
+    return root
+
+random_bst = construct_random_bst()
+
+preorder_traversal(random_bst)
+print("")
+reverse_inorder_traversal(random_bst)
+min_value = find_min_bst(random_bst)
+print("min element in BST:", min_value)
+max_value = find_max_bst(random_bst)
+print("max element in BST:", max_value)
+
+key = int(input("\nPodaj klucz węzła do znalezienia, wypisania elementów na tym poziomie i usunięcia: "))
+subtree_level, subtree_elements = find_level_and_print_elements(random_bst, key)
+if subtree_level is not None:
+    random_bst = delete_node(random_bst, key)
+    print("Drzewo po usunięciu węzła:")
+    preorder_traversal(random_bst)
+else:
+    print("Nie ma takiego wezla w drzewie")
